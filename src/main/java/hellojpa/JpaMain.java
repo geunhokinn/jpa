@@ -18,24 +18,12 @@ public class JpaMain {
 
         try {
 
-            Child child1 = new Child();
-            Child child2 = new Child();
+            Member member = new Member();
+            member.setUsername("Hello");
+            member.setHomeAddress(new Address("city", "street", "10000"));
+            member.setWorkPeriod(new Period());
 
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
-
-            em.persist(parent); // cascade
-//            em.persist(child1);
-//            em.persist(child2);
-
-            em.flush();
-            em.clear();
-
-            Parent findParent = em.find(Parent.class, parent.getId());
-//            findParent.getChildList().remove(0); // cascade and orphanRemoval
-
-            em.remove(findParent); // cascade or orphanRemoval
+            em.persist(member);
 
             tx.commit();
         } catch (Exception e) {

@@ -17,34 +17,25 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team teamA = new Team();
-            teamA.setName("teamA");
-            em.persist(teamA);
 
-            Member memberA = new Member();
-            memberA.setUsername("memberA");
-            memberA.setTeam(teamA);
-            em.persist(memberA);
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            Team teamB = new Team();
-            teamB.setName("teamB");
-            em.persist(teamB);
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
 
-            Member memberB = new Member();
-            memberB.setUsername("memberB");
-            memberB.setTeam(teamB);
-            em.persist(memberB);
+            em.persist(parent); // cascade
+//            em.persist(child1);
+//            em.persist(child2);
 
             em.flush();
             em.clear();
 
-//            Member findMember = em.find(Member.class, member.getId());
+            Parent findParent = em.find(Parent.class, parent.getId());
+//            findParent.getChildList().remove(0); // cascade and orphanRemoval
 
-            List<Member> members = em.createQuery("select m from Member m join fetch m.team", Member.class)
-                    .getResultList();
-            for (Member member : members) {
-                member.getTeam().getName();
-            }
+            em.remove(findParent); // cascade or orphanRemoval
 
             tx.commit();
         } catch (Exception e) {

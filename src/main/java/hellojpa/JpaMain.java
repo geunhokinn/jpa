@@ -17,30 +17,35 @@ public class JpaMain {
         tx.begin();
 
         try {
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
 
-            Member member = new Member();
-            member.setUsername("hello");
+            Member memberA = new Member();
+            memberA.setUsername("memberA");
+            memberA.setTeam(teamA);
+            em.persist(memberA);
 
-            em.persist(member);
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
+
+            Member memberB = new Member();
+            memberB.setUsername("memberB");
+            memberB.setTeam(teamB);
+            em.persist(memberB);
 
             em.flush();
             em.clear();
 
-            Member findMember = em.getReference(Member.class, member.getId());
-            System.out.println("findMember.getClass() = " + findMember.getClass());
+//            Member findMember = em.find(Member.class, member.getId());
 
-//            em.detach(findMember);
-//            em.close();
-//            em.clear();
+            List<Member> members = em.createQuery("select m from Member m join fetch m.team", Member.class)
+                    .getResultList();
+            for (Member member : members) {
+                member.getTeam().getName();
+            }
 
-//            System.out.println(findMember.getUsername()); // 프록시 초기화
-            Hibernate.initialize(findMember); // 강제 초기화
-
-            // 준영속 상태이기 때문에 영속성 컨텍스트가 제공하는 기능을 사용하지 못함.
-            // 버전이 올라가면서 트랜잭션이 유지되면 lazy 로딩을 사용할 수 있으므로 예외가 발생 안함.
-
-            System.out.println("emf.getPersistenceUnitUtil().isLoaded(findMember) = " + emf.getPersistenceUnitUtil().isLoaded(findMember));
-            
             tx.commit();
         } catch (Exception e) {
             tx.rollback();

@@ -3,7 +3,9 @@ package hellojpa;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 //public class Member extends BaseEntity {
@@ -17,13 +19,38 @@ public class Member {
     @Column(name = "USERNAME")
     private String username;
 
-    // 기간 Period
-    @Embedded
-    private Period workPeriod;
+//    // 기간 Period
+//    @Embedded
+//    private Period workPeriod;
 
-    // 집 주소 주소
+    // 집 주소 주소(값 타입)
     @Embedded
     private Address homeAddress;
+
+    @ElementCollection // 값 타입 컬렉션
+    @CollectionTable(name = "FAVORITE_FOOD", joinColumns =
+        @JoinColumn(name = "MEMBER_ID")
+    )
+    @Column(name = "FOOD_NAME") // 내가 정의한 것이 아니고 컬럼명이 하나이다. 예외적으로 허용해준다.
+    private Set<String> favoriteFoods = new HashSet<>();
+
+//    @ElementCollection // 값 타입 컬렉션
+//    @CollectionTable(name = "ADDRESS", joinColumns =
+//        @JoinColumn(name = "MEMBER_ID")
+//    )
+//    private List<Address> addressHistory = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public void setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
+    }
 
     // 회사 주소 주소
 //    @Embedded
@@ -34,13 +61,13 @@ public class Member {
 //    })
 //    private Address workAddress;
 
-    public Period getWorkPeriod() {
-        return workPeriod;
-    }
-
-    public void setWorkPeriod(Period workPeriod) {
-        this.workPeriod = workPeriod;
-    }
+//    public Period getWorkPeriod() {
+//        return workPeriod;
+//    }
+//
+//    public void setWorkPeriod(Period workPeriod) {
+//        this.workPeriod = workPeriod;
+//    }
 
     public Address getHomeAddress() {
         return homeAddress;
@@ -48,6 +75,14 @@ public class Member {
 
     public void setHomeAddress(Address homeAddress) {
         this.homeAddress = homeAddress;
+    }
+
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
+    }
+
+    public void setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
     }
 
     //    @ManyToOne(fetch = FetchType.LAZY) // team 을 프록시 객체로 조회함
